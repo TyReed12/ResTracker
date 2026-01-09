@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Test</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    button {
+      padding: 10px 20px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #4f46e5;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 20px;
+      background: #1e293b;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .error { color: #ef4444; }
+    .success { color: #22c55e; }
+  </style>
+</head>
+<body>
+  <h1>Notion API Connection Test</h1>
+  <p>Click the button to test your API endpoint:</p>
+  <button onclick="testAPI()">Test API Connection</button>
+  <div id="result"></div>
+
+  <script>
+    async function testAPI() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '<div>Testing...</div>';
+
+      try {
+        const response = await fetch('/api/notion/resolutions');
+        const data = await response.json();
+
+        if (!response.ok) {
+          resultDiv.innerHTML = `
+            <div class="error">❌ API Error (Status ${response.status})</div>
+            <div>Response:</div>
+            <div>${JSON.stringify(data, null, 2)}</div>
+          `;
+          return;
+        }
+
+        if (Array.isArray(data) && data.length > 0) {
+          resultDiv.innerHTML = `
+            <div class="success">✅ Connection Successful!</div>
+            <div>Found ${data.length} resolutions:</div>
+            <div>${JSON.stringify(data, null, 2)}</div>
+          `;
+        } else if (Array.isArray(data) && data.length === 0) {
+          resultDiv.innerHTML = `
+            <div class="error">⚠️ Connected but No Data</div>
+            <div>The API is working, but your Notion database is empty.</div>
+            <div>Add some resolutions to your Notion database and try again.</div>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <div class="error">❌ Unexpected Response</div>
+            <div>${JSON.stringify(data, null, 2)}</div>
+          `;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <div class="error">❌ Connection Failed</div>
+          <div>Error: ${error.message}</div>
+          <div>Possible causes:</div>
+          <ul>
+            <li>Environment variables not set in Vercel</li>
+            <li>Notion integration not connected to database</li>
+            <li>API route not deployed properly</li>
+          </ul>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
