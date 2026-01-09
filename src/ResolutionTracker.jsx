@@ -22,13 +22,22 @@ const notionService = {
   
   async updateResolution(pageId, updates) {
     try {
+      console.log('Updating resolution:', pageId, updates);
       const response = await fetch('/api/notion/resolutions', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pageId, updates })
       });
-      if (!response.ok) throw new Error('Failed to update');
-      return await response.json();
+
+      const result = await response.json();
+      console.log('Update response:', response.status, result);
+
+      if (!response.ok) {
+        console.error('Failed to update resolution:', result);
+        return null;
+      }
+
+      return result;
     } catch (error) {
       console.error('Notion update error:', error);
       return null;
@@ -37,13 +46,22 @@ const notionService = {
   
   async createResolution(data) {
     try {
+      console.log('Creating resolution:', data);
       const response = await fetch('/api/notion/resolutions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      if (!response.ok) throw new Error('Failed to create');
-      return await response.json();
+
+      const result = await response.json();
+      console.log('Create response:', response.status, result);
+
+      if (!response.ok) {
+        console.error('Failed to create resolution:', result);
+        return null;
+      }
+
+      return result;
     } catch (error) {
       console.error('Notion create error:', error);
       return null;
