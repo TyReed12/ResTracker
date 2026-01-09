@@ -62,10 +62,10 @@ export default async function handler(req, res) {
         id: page.id,
         notionPageId: page.id,
         title: page.properties['Resolution']?.title?.[0]?.plain_text || 'Untitled',
-        category: page.properties['Category']?.rich_text?.[0]?.plain_text || 'Personal Growth',
+        category: page.properties['Category']?.select?.name || 'Personal Growth',
         target: page.properties['Target']?.number || 0,
         current: page.properties['Current Progress']?.number || 0,
-        unit: page.properties['Unit']?.select?.name || 'times',
+        unit: page.properties['Unit']?.rich_text?.[0]?.plain_text || 'times',
         frequency: page.properties['Frequency']?.select?.name || 'weekly',
         streak: page.properties['Streak']?.number || 0,
         lastCheckin: page.properties['Last Check-in']?.date?.start || '',
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
 
       if (updates.category) {
         properties['Category'] = {
-          rich_text: [{ text: { content: updates.category } }]
+          select: { name: updates.category }
         };
       }
 
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
 
       if (updates.unit) {
         properties['Unit'] = {
-          select: { name: updates.unit }
+          rich_text: [{ text: { content: updates.unit } }]
         };
       }
 
@@ -160,7 +160,7 @@ export default async function handler(req, res) {
           title: [{ text: { content: title } }]
         },
         'Category': {
-          rich_text: [{ text: { content: category || 'Personal Growth' } }]
+          select: { name: category || 'Personal Growth' }
         },
         'Target': {
           number: target || 0
@@ -169,7 +169,7 @@ export default async function handler(req, res) {
           number: current || 0
         },
         'Unit': {
-          select: { name: unit || 'times' }
+          rich_text: [{ text: { content: unit || 'times' } }]
         },
         'Frequency': {
           select: { name: frequency || 'weekly' }
