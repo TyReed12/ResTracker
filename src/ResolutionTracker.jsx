@@ -741,14 +741,13 @@ const ResolutionTracker = () => {
         
         {/* Desktop Navigation */}
         <nav className="desktop-nav">
-          {['dashboard', 'notion', 'zapier'].map(tab => (
+          {['dashboard', 'zapier'].map(tab => (
             <button
               key={tab}
               className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}
             >
               {tab === 'dashboard' && '📊 Dashboard'}
-              {tab === 'notion' && '📝 Notion'}
               {tab === 'zapier' && '⚡ Zapier'}
             </button>
           ))}
@@ -1184,7 +1183,6 @@ export default async function handler(req, res) {
       <nav className="mobile-nav">
         {[
           { id: 'dashboard', icon: '📊', label: 'Dashboard' },
-          { id: 'notion', icon: '📝', label: 'Notion' },
           { id: 'zapier', icon: '⚡', label: 'Zapier' },
         ].map(item => (
           <button
