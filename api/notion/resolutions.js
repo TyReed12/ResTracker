@@ -65,8 +65,8 @@ export default async function handler(req, res) {
         category: page.properties['Category']?.rich_text?.[0]?.plain_text || 'Personal Growth',
         target: page.properties['Target']?.number || 0,
         current: page.properties['Current Progress']?.number || 0,
-        unit: page.properties['Unit']?.rich_text?.[0]?.plain_text || 'times',
-        frequency: page.properties['Frequency']?.rich_text?.[0]?.plain_text || 'weekly',
+        unit: page.properties['Unit']?.select?.name || 'times',
+        frequency: page.properties['Frequency']?.select?.name || 'weekly',
         streak: page.properties['Streak']?.number || 0,
         lastCheckin: page.properties['Last Check-in']?.date?.start || '',
       }));
@@ -117,13 +117,13 @@ export default async function handler(req, res) {
 
       if (updates.unit) {
         properties['Unit'] = {
-          rich_text: [{ text: { content: updates.unit } }]
+          select: { name: updates.unit }
         };
       }
 
       if (updates.frequency) {
         properties['Frequency'] = {
-          rich_text: [{ text: { content: updates.frequency } }]
+          select: { name: updates.frequency }
         };
       }
 
@@ -169,10 +169,10 @@ export default async function handler(req, res) {
           number: current || 0
         },
         'Unit': {
-          rich_text: [{ text: { content: unit || 'times' } }]
+          select: { name: unit || 'times' }
         },
         'Frequency': {
-          rich_text: [{ text: { content: frequency || 'weekly' } }]
+          select: { name: frequency || 'weekly' }
         },
         'Streak': {
           number: streak || 0
