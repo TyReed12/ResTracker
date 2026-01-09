@@ -255,7 +255,7 @@ const ResolutionTracker = () => {
   // Add new resolution
   const addResolution = async () => {
     if (!newResolution.title.trim()) return;
-    
+
     const resolution = {
       id: `local-${Date.now()}`,
       ...newResolution,
@@ -264,24 +264,23 @@ const ResolutionTracker = () => {
       lastCheckin: new Date().toISOString().split('T')[0],
       notionPageId: null
     };
-    
-    // Add locally first
+
+    // Add locally first for instant feedback
     setResolutions(prev => [...prev, resolution]);
     setShowAddModal(false);
     setNewResolution({ title: '', category: 'Personal Growth', target: 1, unit: 'times', frequency: 'weekly' });
-    
+
     // Create in Notion if online
     if (isOnline) {
       setSyncStatus('syncing');
       const result = await notionService.createResolution(resolution);
       if (result?.id) {
-        // Update with Notion page ID
-        setResolutions(prev => prev.map(r => 
-          r.id === resolution.id ? { ...r, notionPageId: result.id } : r
-        ));
+        // Refresh from Notion to get the complete data
+        await fetchResolutions();
         setSyncStatus('synced');
       } else {
         setSyncStatus('error');
+        console.error('Failed to create resolution in Notion');
       }
     }
   };
