@@ -180,6 +180,8 @@ export default async function handler(req, res) {
         };
       }
 
+      console.log('Creating page with properties:', JSON.stringify(properties, null, 2));
+
       const response = await fetch(`${NOTION_API}/pages`, {
         method: 'POST',
         headers,
@@ -192,7 +194,12 @@ export default async function handler(req, res) {
       if (!response.ok) {
         const error = await response.json();
         console.error('Notion create error:', error);
-        return res.status(response.status).json({ error: 'Failed to create in Notion', details: error });
+        console.error('Sent properties:', properties);
+        return res.status(response.status).json({
+          error: 'Failed to create in Notion',
+          details: error,
+          sentData: { title, category, target, unit, frequency }
+        });
       }
 
       const data = await response.json();
