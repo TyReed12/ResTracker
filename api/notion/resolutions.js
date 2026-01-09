@@ -62,11 +62,11 @@ export default async function handler(req, res) {
         id: page.id,
         notionPageId: page.id,
         title: page.properties['Resolution']?.title?.[0]?.plain_text || 'Untitled',
-        category: page.properties['Category']?.select?.name || 'Personal Growth',
+        category: page.properties['Category']?.rich_text?.[0]?.plain_text || 'Personal Growth',
         target: page.properties['Target']?.number || 0,
         current: page.properties['Current Progress']?.number || 0,
-        unit: page.properties['Unit']?.select?.name || 'times',
-        frequency: page.properties['Frequency']?.select?.name || 'weekly',
+        unit: page.properties['Unit']?.rich_text?.[0]?.plain_text || 'times',
+        frequency: page.properties['Frequency']?.rich_text?.[0]?.plain_text || 'weekly',
         streak: page.properties['Streak']?.number || 0,
         lastCheckin: page.properties['Last Check-in']?.date?.start || '',
       }));
@@ -106,7 +106,9 @@ export default async function handler(req, res) {
       }
 
       if (updates.category) {
-        properties['Category'] = { select: { name: updates.category } };
+        properties['Category'] = {
+          rich_text: [{ text: { content: updates.category } }]
+        };
       }
 
       if (updates.target !== undefined) {
@@ -114,11 +116,15 @@ export default async function handler(req, res) {
       }
 
       if (updates.unit) {
-        properties['Unit'] = { select: { name: updates.unit } };
+        properties['Unit'] = {
+          rich_text: [{ text: { content: updates.unit } }]
+        };
       }
 
       if (updates.frequency) {
-        properties['Frequency'] = { select: { name: updates.frequency } };
+        properties['Frequency'] = {
+          rich_text: [{ text: { content: updates.frequency } }]
+        };
       }
 
       const response = await fetch(`${NOTION_API}/pages/${pageId}`, {
@@ -150,26 +156,26 @@ export default async function handler(req, res) {
       }
 
       const properties = {
-        'Resolution': { 
-          title: [{ text: { content: title } }] 
+        'Resolution': {
+          title: [{ text: { content: title } }]
         },
-        'Category': { 
-          select: { name: category || 'Personal Growth' } 
+        'Category': {
+          rich_text: [{ text: { content: category || 'Personal Growth' } }]
         },
-        'Target': { 
-          number: target || 0 
+        'Target': {
+          number: target || 0
         },
-        'Current Progress': { 
-          number: current || 0 
+        'Current Progress': {
+          number: current || 0
         },
-        'Unit': { 
-          select: { name: unit || 'times' } 
+        'Unit': {
+          rich_text: [{ text: { content: unit || 'times' } }]
         },
-        'Frequency': { 
-          select: { name: frequency || 'weekly' } 
+        'Frequency': {
+          rich_text: [{ text: { content: frequency || 'weekly' } }]
         },
-        'Streak': { 
-          number: streak || 0 
+        'Streak': {
+          number: streak || 0
         },
       };
 
