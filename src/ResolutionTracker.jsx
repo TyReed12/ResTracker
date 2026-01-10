@@ -1148,17 +1148,67 @@ export default async function handler(req, res) {
             <div style={{ marginBottom: '28px' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>⚡ Zapier Workflows</h2>
               <p style={{ color: '#94A3B8', fontSize: '15px', lineHeight: 1.6 }}>
-                Automate reminders, celebrations, and progress tracking.
+                Click "Use Template" to auto-create Zaps for your Resolution Tracker.
               </p>
+            </div>
+
+            {/* Setup Instructions */}
+            <div style={{
+              background: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>ℹ️</span> First Time Setup
+              </h3>
+              <ol style={{ margin: 0, paddingLeft: '20px', color: '#94A3B8', fontSize: '13px', lineHeight: 1.8 }}>
+                <li>Open your Notion database and click the "..." menu (top right)</li>
+                <li>Click "Add connections" and select "Resolution Tracker" integration</li>
+                <li>Click any template below to create your Zap</li>
+                <li>When prompted, connect your Notion account to Zapier</li>
+                <li>Select your Resolution Tracker database (ID: 2e2f4712ae7780f0b76ed65a6ebf7378)</li>
+              </ol>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
-                { icon: '📱', title: 'Daily Reminders', desc: 'SMS if no check-in today', flow: ['Schedule', 'Notion', 'Twilio'] },
-                { icon: '🎉', title: 'Milestones', desc: 'Celebrate 25/50/75/100%', flow: ['Notion', 'Filter', 'Slack'] },
-                { icon: '📊', title: 'Weekly Report', desc: 'Email digest Sundays', flow: ['Schedule', 'Notion', 'Gmail'] },
-                { icon: '📅', title: 'Calendar Blocks', desc: 'Focus time for lagging goals', flow: ['Notion', 'Filter', 'Calendar'] },
-                { icon: '💬', title: 'Text Updates', desc: 'Reply to SMS → Update Notion', flow: ['Twilio', 'Parse', 'Notion'] },
+                {
+                  icon: '📱',
+                  title: 'Daily Check-in Reminder',
+                  desc: 'Get a text/email every evening if you haven\'t updated your goals',
+                  flow: ['Schedule', 'Notion', 'SMS/Email'],
+                  zapUrl: 'https://zapier.com/webintent/create-zap?template=1234567'
+                },
+                {
+                  icon: '🎉',
+                  title: 'Milestone Celebrations',
+                  desc: 'Get notified when you hit 25%, 50%, 75%, or 100% of any goal',
+                  flow: ['Notion', 'Filter', 'Slack/Email'],
+                  zapUrl: 'https://zapier.com/webintent/create-zap?template=1234568'
+                },
+                {
+                  icon: '📊',
+                  title: 'Weekly Progress Report',
+                  desc: 'Receive a summary email every Sunday with all your progress',
+                  flow: ['Schedule', 'Notion', 'Gmail'],
+                  zapUrl: 'https://zapier.com/webintent/create-zap?template=1234569'
+                },
+                {
+                  icon: '🔥',
+                  title: 'Streak Protection Alert',
+                  desc: 'Get warned before you lose an active streak',
+                  flow: ['Schedule', 'Notion', 'SMS'],
+                  zapUrl: 'https://zapier.com/webintent/create-zap?template=1234570'
+                },
+                {
+                  icon: '🤝',
+                  title: 'Accountability Partner',
+                  desc: 'Auto-share progress updates with a friend or coach',
+                  flow: ['Notion', 'Filter', 'Email'],
+                  zapUrl: 'https://zapier.com/webintent/create-zap?template=1234571'
+                },
               ].map((workflow, i) => (
                 <div key={i} className="integration-card">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
@@ -1175,11 +1225,11 @@ export default async function handler(req, res) {
                     }}>{workflow.icon}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 600 }}>{workflow.title}</h3>
-                      <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#64748B' }}>{workflow.desc}</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#64748B', lineHeight: 1.5 }}>{workflow.desc}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                         {workflow.flow.map((step, j) => (
                           <React.Fragment key={j}>
-                            <span className="workflow-badge" style={{ 
+                            <span className="workflow-badge" style={{
                               background: j === 0 ? 'rgba(99, 102, 241, 0.15)' : j === workflow.flow.length - 1 ? 'rgba(236, 72, 153, 0.15)' : 'rgba(34, 197, 94, 0.15)',
                               color: j === 0 ? '#A5B4FC' : j === workflow.flow.length - 1 ? '#F472B6' : '#4ADE80',
                             }}>{step}</span>
@@ -1187,10 +1237,70 @@ export default async function handler(req, res) {
                           </React.Fragment>
                         ))}
                       </div>
+                      <a
+                        href="https://zapier.com/app/editor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          background: 'rgba(99, 102, 241, 0.2)',
+                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          borderRadius: '8px',
+                          color: '#A5B4FC',
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          textDecoration: 'none',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'rgba(99, 102, 241, 0.3)';
+                          e.target.style.borderColor = 'rgba(99, 102, 241, 0.5)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'rgba(99, 102, 241, 0.2)';
+                          e.target.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                        }}
+                      >
+                        <span>⚡</span> Create This Zap
+                      </a>
                     </div>
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Manual Setup Guide */}
+            <div style={{
+              marginTop: '32px',
+              padding: '20px',
+              background: 'rgba(100, 116, 139, 0.1)',
+              border: '1px solid rgba(100, 116, 139, 0.2)',
+              borderRadius: '12px'
+            }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
+                📖 Prefer Manual Setup?
+              </h3>
+              <p style={{ color: '#94A3B8', fontSize: '14px', lineHeight: 1.6, marginBottom: '12px' }}>
+                Check out our detailed guide with step-by-step instructions, code snippets, and troubleshooting tips.
+              </p>
+              <a
+                href="https://github.com/yourusername/resolution-tracker/blob/main/ZAPIER_SETUP.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: '#A5B4FC',
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                }}
+              >
+                View Full Zapier Setup Guide →
+              </a>
             </div>
           </div>
         )}
