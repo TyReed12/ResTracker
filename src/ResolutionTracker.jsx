@@ -66,6 +66,30 @@ const notionService = {
       console.error('Notion create error:', error);
       return null;
     }
+  },
+
+  async deleteResolution(pageId) {
+    try {
+      console.log('Deleting resolution:', pageId);
+      const response = await fetch('/api/notion/resolutions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pageId })
+      });
+
+      const result = await response.json();
+      console.log('Delete response:', response.status, result);
+
+      if (!response.ok) {
+        console.error('Failed to delete resolution:', result);
+        return null;
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Notion delete error:', error);
+      return null;
+    }
   }
 };
 
@@ -299,6 +323,37 @@ const ResolutionTracker = () => {
       } else {
         setSyncStatus('error');
         console.error('Failed to create resolution in Notion');
+      }
+    }
+  };
+
+  // Delete resolution
+  const deleteResolution = async (resolutionId) => {
+    const resolution = resolutions.find(r => r.id === resolutionId);
+    if (!resolution) return;
+
+    // Confirm deletion
+    if (!window.confirm(`Are you sure you want to delete "${resolution.title}"?`)) {
+      return;
+    }
+
+    // Remove locally first for instant feedback
+    setResolutions(prev => prev.filter(r => r.id !== resolutionId));
+
+    // Close detail modal if this resolution is selected
+    if (selectedResolution?.id === resolutionId) {
+      setSelectedResolution(null);
+    }
+
+    // Delete from Notion if it exists there and we're online
+    if (resolution.notionPageId && isOnline) {
+      setSyncStatus('syncing');
+      const result = await notionService.deleteResolution(resolution.notionPageId);
+      if (result?.success) {
+        setSyncStatus('synced');
+      } else {
+        setSyncStatus('error');
+        console.error('Failed to delete resolution from Notion');
       }
     }
   };
@@ -936,7 +991,26 @@ const ResolutionTracker = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} onClick={e => e.stopPropagation()}>
                         <button className="increment-btn" onClick={() => updateProgress(resolution.id, -1)}>−</button>
                         <button className="increment-btn" onClick={() => updateProgress(resolution.id, 1)}>+</button>
-                        <span style={{ fontSize: '12px', color: '#475569', marginLeft: 'auto' }}>Tap for details</span>
+                        <button
+                          className="increment-btn"
+                          onClick={() => deleteResolution(resolution.id)}
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.15)',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            color: '#F87171',
+                            marginLeft: 'auto'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.background = 'rgba(239, 68, 68, 0.25)';
+                            e.target.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.background = 'rgba(239, 68, 68, 0.15)';
+                            e.target.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                          }}
+                        >
+                          🗑️
+                        </button>
                       </div>
                     </div>
                   );
@@ -1498,22 +1572,50 @@ export default async function handler(req, res) {
             
             {/* Update Buttons */}
             <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-              <button 
-                className="btn-secondary" 
+              <button
+                className="btn-secondary"
                 style={{ flex: 1, fontSize: '16px' }}
                 onClick={() => updateProgress(selectedResolution.id, -1)}
               >
                 − Remove
               </button>
-              <button 
-                className="btn-primary" 
+              <button
+                className="btn-primary"
                 style={{ flex: 1, fontSize: '16px' }}
                 onClick={() => updateProgress(selectedResolution.id, 1)}
               >
                 + Add
               </button>
             </div>
-            
+
+            {/* Delete Button */}
+            <button
+              onClick={() => deleteResolution(selectedResolution.id)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                marginBottom: '16px',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '12px',
+                color: '#F87171',
+                fontSize: '14px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(239, 68, 68, 0.25)';
+                e.target.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(239, 68, 68, 0.15)';
+                e.target.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+              }}
+            >
+              🗑️ Delete Resolution
+            </button>
+
             <p style={{ margin: 0, textAlign: 'center', fontSize: '12px', color: '#475569' }}>
               Last updated: {selectedResolution.lastCheckin || 'Never'}
             </p>
